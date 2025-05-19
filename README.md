@@ -35,7 +35,7 @@
 1. リポジトリをクローン
 
 ```bash
-git clone [リポジトリのURL]
+git clone https://github.com/kkiuchan/task-manager-app
 cd task-manager-app
 ```
 
