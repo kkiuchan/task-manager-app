@@ -1,0 +1,27 @@
+# Node.js
+node_modules/
+
+# 環境変数
+.env
+
+# ログ
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OSごとの不要ファイル
+.DS_Store
+Thumbs.db
+
+# Next.js
+.next/
+
+# Prisma
+prisma/dev.db
+
+# Docker
+*.pid
+
+# その他
+/dist
+/build 
