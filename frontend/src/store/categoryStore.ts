@@ -1,11 +1,14 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { Category, categoryApi } from "../lib/api";
+import { Category as ApiCategory, categoryApi } from "../lib/api";
+
+export type Category = ApiCategory;
 
 interface CategoryState {
   categories: Category[];
   loading: boolean;
   error: string | null;
+  setCategories: (categories: Category[]) => void;
   fetchCategory: (id: number) => Promise<Category | null>;
   fetchCategories: () => Promise<void>;
   addCategory: (name: string) => Promise<number>;
@@ -20,9 +23,29 @@ export const useCategoryStore = create<CategoryState>()(
       loading: false,
       error: null,
 
+      setCategories: (categories: Category[]) => {
+        set({ categories });
+      },
+
       fetchCategory: async (id: number) => {
         const categories = get().categories;
         return categories.find((cat) => cat.id === id) || null;
+      },
+
+      getCategories: async () => {
+        set({ loading: true, error: null });
+        try {
+          const categories = await categoryApi.getCategories();
+          set({ categories, loading: false });
+          return categories;
+        } catch (e) {
+          set({
+            error:
+              e instanceof Error ? e.message : "予期せぬエラーが発生しました",
+            loading: false,
+          });
+          console.error("カテゴリの取得に失敗しました:", e);
+        }
       },
 
       fetchCategories: async () => {

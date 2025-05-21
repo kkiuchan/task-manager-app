@@ -16,6 +16,7 @@ interface TaskState {
   tasks: Task[];
   loading: boolean;
   error: string | null;
+  setTasks: (tasks: Task[]) => void;
   fetchTasks: (filter?: TaskFilterParams) => Promise<void>;
   addTask: (task: Omit<Task, "id">) => Promise<number>;
   updateTask: (id: number, task: Partial<Task>) => Promise<void>;
@@ -83,6 +84,29 @@ export const useTaskStore = create<TaskState>()(
       tasks: [],
       loading: false,
       error: null,
+
+      setTasks: (tasks: Task[]) => {
+        set({ tasks });
+      },
+
+      getTasks: async (filter?: TaskFilterParams) => {
+        set({ loading: true, error: null });
+        try {
+          const tasks = await taskApi.getTasks();
+          if (filter) {
+            const filteredTasks = filterAndSortTasks(tasks, filter);
+            set({ tasks: filteredTasks, loading: false });
+          } else {
+            set({ tasks, loading: false });
+          }
+        } catch (e) {
+          set({
+            error:
+              e instanceof Error ? e.message : "予期せぬエラーが発生しました",
+            loading: false,
+          });
+        }
+      },
 
       fetchTasks: async (filter?: TaskFilterParams) => {
         set({ loading: true, error: null });
