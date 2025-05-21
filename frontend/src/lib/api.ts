@@ -1,6 +1,8 @@
+import { Category, Task } from "@/types";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:4000/api";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -8,20 +10,6 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
-export interface Task {
-  id: number;
-  title: string;
-  description: string;
-  completed: boolean;
-  dueDate: string;
-  category: Category | null;
-}
-
-export interface Category {
-  id: number;
-  name: string;
-}
 
 export const taskApi = {
   getTasks: async () => {
@@ -64,3 +52,23 @@ export const categoryApi = {
     await api.delete(`/categories/${id}`);
   },
 };
+
+export async function fetchInitialData() {
+  try {
+    const [tasksResponse, categoriesResponse] = await Promise.all([
+      taskApi.getTasks(),
+      categoryApi.getCategories(),
+    ]);
+
+    return {
+      tasks: tasksResponse,
+      categories: categoriesResponse,
+    };
+  } catch (error) {
+    console.error("初期データの取得に失敗:", error);
+    return {
+      tasks: [],
+      categories: [],
+    };
+  }
+}

@@ -1,11 +1,13 @@
+import { Category } from "@/types";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { Category, categoryApi } from "../lib/api";
+import { categoryApi } from "../lib/api";
 
 interface CategoryState {
   categories: Category[];
   loading: boolean;
   error: string | null;
+  setCategories: (categories: Category[]) => void;
   fetchCategory: (id: number) => Promise<Category | null>;
   fetchCategories: () => Promise<void>;
   addCategory: (name: string) => Promise<number>;
@@ -19,6 +21,10 @@ export const useCategoryStore = create<CategoryState>()(
       categories: [],
       loading: false,
       error: null,
+
+      setCategories: (categories: Category[]) => {
+        set({ categories });
+      },
 
       fetchCategory: async (id: number) => {
         const categories = get().categories;

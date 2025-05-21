@@ -1,5 +1,5 @@
 import { useCategoryStore } from "@/store/categoryStore";
-import { Category } from "@/lib/api";
+import { Category } from "@/types";
 import { useMenuStore } from "@/store/menuStore";
 import {
   CheckCircle,

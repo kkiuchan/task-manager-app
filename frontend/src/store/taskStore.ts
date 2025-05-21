@@ -1,6 +1,7 @@
+import { Category } from "@/types";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { Category, taskApi } from "../lib/api";
+import { taskApi } from "../lib/api";
 import { useFilterStore } from "./filterStore";
 
 export interface Task {
@@ -16,6 +17,7 @@ interface TaskState {
   tasks: Task[];
   loading: boolean;
   error: string | null;
+  setTasks: (tasks: Task[]) => void;
   fetchTasks: (filter?: TaskFilterParams) => Promise<void>;
   addTask: (task: Omit<Task, "id">) => Promise<number>;
   updateTask: (id: number, task: Partial<Task>) => Promise<void>;
@@ -83,6 +85,10 @@ export const useTaskStore = create<TaskState>()(
       tasks: [],
       loading: false,
       error: null,
+
+      setTasks: (tasks: Task[]) => {
+        set({ tasks });
+      },
 
       fetchTasks: async (filter?: TaskFilterParams) => {
         set({ loading: true, error: null });
