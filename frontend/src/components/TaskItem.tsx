@@ -51,7 +51,8 @@ const TaskItem: React.FC<Props> = React.memo(
       setOpenMenuId?.(null);
     };
 
-    const handleSave = async () => {
+    const handleSave = async (e: React.FormEvent) => {
+      e.preventDefault();
       let categoryId: number | undefined = undefined;
       let finalCategoryName: string | undefined = undefined;
 

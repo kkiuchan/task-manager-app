@@ -129,11 +129,14 @@ export const updateTask = async (req: Request, res: Response) => {
     if (completed !== undefined) data.completed = completed;
 
     // カテゴリの紐付け・解除
-    if (category && category.id) {
-      data.category = { connect: { id: category.id } };
-    } else {
-      data.category = { disconnect: true };
+    if (category) {
+      if (category.id) {
+        data.category = { connect: { id: category.id } };
+      } else {
+        data.category = { disconnect: true };
+      }
     }
+    // カテゴリ情報がない場合は既存のカテゴリを維持
 
     const task = await prisma.task.update({
       where: { id: Number(id) },

@@ -43,8 +43,10 @@ const TaskList: React.FC = () => {
         const task = tasks.find((t) => t.id === id);
         if (!task) return;
 
-        await updateTask(id, { completed: !task.completed });
-        // fetchTasks({ search, category, completed, sort, order });
+        await updateTask(id, {
+          completed: !task.completed,
+          category: task.category,
+        });
       } catch (error) {
         console.error("タスクの更新に失敗しました:", error);
       }
