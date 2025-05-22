@@ -1,6 +1,7 @@
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import taskRoutes from "./routes/taskRoutes";
+import categoryRoutes from "./routes/categoryRoutes";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -20,8 +21,8 @@ app.get("/api", (req: Request, res: Response) => {
 });
 
 // タスクAPI
-app.use("/api", taskRoutes);
-
+app.use("/api/tasks", taskRoutes);
+app.use("/api/categories", categoryRoutes);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
