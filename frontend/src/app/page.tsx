@@ -1,27 +1,18 @@
-"use client";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { useCategoryStore } from "@/store/categoryStore";
+import { categoryApi, taskApi } from "@/lib/api";
+import { TaskManager } from "./components/client/TaskManager";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Calendar } from "lucide-react";
-import { useEffect } from "react";
-import TaskFilter from "../components/TaskFilter";
-import TaskList from "../components/TaskList";
-import TaskModal from "../components/TaskModal";
 
-export default function Home() {
-  const fetchCategories = useCategoryStore((state) => state.fetchCategories);
+// 動的レンダリングを有効化
+export const dynamic = "force-dynamic";
 
-  console.log("Home rendered");
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
-
+export default async function Home() {
+  // サーバーサイドでデータを取得
+  const [tasks, categories] = await Promise.all([
+    taskApi.getTasks(),
+    categoryApi.getCategories(),
+  ]);
   const today = format(new Date(), "yyyy年MM月dd日 (EEE)", { locale: ja });
 
   return (
@@ -33,33 +24,7 @@ export default function Home() {
         <Calendar className="w-4 h-4 text-gray-400 mr-1" />
         <span className="text-xs text-gray-400">{today}</span>
       </div>
-      <TaskModal />
-      {/* PC用: インライン表示 */}
-      <div className="hidden md:block">
-        <TaskFilter />
-      </div>
-      {/* モバイル用: Drawerで表示 */}
-      <div className="block md:hidden">
-        <div className="fixed bottom-0 left-0 w-full z-40 px-2 pb-4 ">
-          <Drawer>
-            <DrawerTrigger asChild>
-              <div className="flex flex-col items-center w-full bg-white/90 cursor-pointer">
-                {/* ハンドル部分 */}
-                <div className="bg-gray-300 rounded-full w-12 h-1.5 my-2" />
-                {/* ラベル */}
-                <span className="text-sm text-gray-600">フィルターを開く</span>
-              </div>
-            </DrawerTrigger>
-            <DrawerContent className="pb-4">
-              <DrawerTitle className="text-center py-2">フィルター</DrawerTitle>
-              <TaskFilter />
-            </DrawerContent>
-          </Drawer>
-        </div>
-      </div>
-      <div className="flex-1 pb-12">
-        <TaskList />
-      </div>
+      <TaskManager initialTasks={tasks} initialCategories={categories} />
     </main>
   );
 }

@@ -2,7 +2,6 @@
 
 import TaskFilter from "@/components/TaskFilter";
 import TaskList from "@/components/TaskList";
-import TaskModal from "@/components/TaskModal";
 import {
   Drawer,
   DrawerContent,
@@ -11,7 +10,19 @@ import {
 } from "@/components/ui/drawer";
 import { Category, useCategoryStore } from "@/store/categoryStore";
 import { Task, useTaskStore } from "@/store/taskStore";
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
+// 遅延ローディング用のコンポーネント
+const TaskModal = dynamic(() => import("@/components/TaskModal"), {
+  loading: () => <div className="p-4 text-center">読み込み中...</div>,
+  ssr: false,
+});
+
+// モバイル用のTaskFilterのみ遅延ローディング
+const MobileTaskFilter = dynamic(() => import("@/components/TaskFilter"), {
+  loading: () => <div className="p-4 text-center">読み込み中...</div>,
+  ssr: false,
+});
 
 interface TaskManagerProps {
   initialTasks: Task[];
@@ -31,14 +42,15 @@ export function TaskManager({
   }, [initialTasks, initialCategories, setTasks, setCategories]);
 
   return (
-    <div className="space-y-4">
+    <>
+      <TaskModal />
       {/* PC用: インライン表示 */}
       <div className="hidden md:block">
         <TaskFilter />
       </div>
       {/* モバイル用: Drawerで表示 */}
       <div className="block md:hidden">
-        <div className="fixed bottom-0 left-0 w-full z-40 px-2 pb-4">
+        <div className="fixed bottom-0 left-0 w-full z-40 px-2 pb-4 ">
           <Drawer>
             <DrawerTrigger asChild>
               <div className="flex flex-col items-center w-full bg-white/90 cursor-pointer">
@@ -50,7 +62,7 @@ export function TaskManager({
             </DrawerTrigger>
             <DrawerContent className="pb-4">
               <DrawerTitle className="text-center py-2">フィルター</DrawerTitle>
-              <TaskFilter />
+              <MobileTaskFilter />
             </DrawerContent>
           </Drawer>
         </div>
@@ -58,30 +70,6 @@ export function TaskManager({
       <div className="flex-1 pb-12">
         <TaskList />
       </div>
-      <Drawer>
-        <DrawerTrigger asChild>
-          <button className="fixed bottom-4 right-4 bg-primary text-primary-foreground rounded-full p-4 shadow-lg hover:bg-primary/90">
-            <span className="sr-only">タスクを追加</span>
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-          </button>
-        </DrawerTrigger>
-        <DrawerContent>
-          <DrawerTitle>タスクを追加</DrawerTitle>
-          <TaskModal />
-        </DrawerContent>
-      </Drawer>
-    </div>
+    </>
   );
 }
